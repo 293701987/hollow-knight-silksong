@@ -114,10 +114,12 @@ async function fetchWithProgress(url) {
   let response;
 
   try {
-    response = await originalFetch(url);
+    const absoluteUrl = new URL(url, document.baseURI).href;
+response = await originalFetch(absoluteUrl);
   } catch (err) {
     throw new Error(
-      "FETCH REJECTED | URL: " + url +
+      "FETCH REJECTED | URL: " + new URL(url, document.baseURI).href +
+" | PAGE BASE: " + document.baseURI +
       " | TYPE: " + err.name +
       " | MESSAGE: " + err.message
     );
