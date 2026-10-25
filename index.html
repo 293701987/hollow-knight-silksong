@@ -26,7 +26,8 @@
 const loadingText = document.querySelector("#loading-text");
 const CACHE_NAME = "hksilksongcache-v2"; // bump version if needed
 let diagnosticStage = "script startup";
-  
+loadingText.textContent = "SCRIPT STARTED";
+
 /* ================= FETCH OVERRIDE ================= */
 const originalFetch = window.fetch;
 
