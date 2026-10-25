@@ -3,17 +3,44 @@
 <body>
 <pre id="result">Testing fetch...</pre>
 <script>
-const url = "https://cdn.jsdelivr.net/gh/achroma-ubg/svg@latest/index.svg";
+const url = "https://cdn.jsdelivr.net/gh/web-ports/hollow-knight-silksong@master/StreamingAssets/aa/WebGL.zip.part1";
+const result = document.getElementById("result");
 
-fetch(url, { mode: "cors", cache: "no-store" })
-  .then(r => {
-    document.getElementById("result").textContent =
-      "Fetch succeeded. HTTP status: " + r.status;
-  })
-  .catch(e => {
-    document.getElementById("result").textContent =
-      "Fetch failed: " + e.name + ": " + e.message;
-  });
+async function test() {
+  try {
+    result.textContent = "Fetching chunk...";
+    const response = await fetch(url, {
+      mode: "cors",
+      cache: "no-store"
+    });
+
+    result.textContent =
+      "HTTP " + response.status + ". Reading body...";
+
+    if (!response.body) {
+      throw new Error("Response has no readable body");
+    }
+
+    const reader = response.body.getReader();
+    let bytes = 0;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.length;
+      result.textContent =
+        "Reading chunk... " + (bytes / 1048576).toFixed(2) + " MB";
+    }
+
+    result.textContent =
+      "SUCCESS! Read " + (bytes / 1048576).toFixed(2) + " MB";
+  } catch (e) {
+    result.textContent =
+      "FAILED: " + e.name + ": " + e.message;
+  }
+}
+
+test();
 </script>
 </body>
 </html>
