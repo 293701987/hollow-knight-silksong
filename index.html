@@ -30,7 +30,7 @@ let diagnosticStage = "script startup";
 /* ================= FETCH OVERRIDE ================= */
 const originalFetch = window.fetch;
 
-window. = async function(resource, options) {
+window.fetch = async function(resource, options) {
   let url = typeof resource === "string" ? resource : resource.url;
   let cleanPath = url.split("/").pop();
 
