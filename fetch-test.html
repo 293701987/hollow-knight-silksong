@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<body>
+<pre id="result">Testing fetch...</pre>
+<script>
+const url = "https://cdn.jsdelivr.net/gh/web-ports/hollow-knight-silksong@master/StreamingAssets/aa/WebGL.zip.part1";
+
+fetch(url, { mode: "cors", cache: "no-store" })
+  .then(r => {
+    document.getElementById("result").textContent =
+      "Fetch succeeded. HTTP status: " + r.status;
+  })
+  .catch(e => {
+    document.getElementById("result").textContent =
+      "Fetch failed: " + e.name + ": " + e.message;
+  });
+</script>
+</body>
+</html>
