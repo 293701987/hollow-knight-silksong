@@ -30,7 +30,7 @@ let diagnosticStage = "script startup";
 /* ================= FETCH OVERRIDE ================= */
 const originalFetch = window.fetch;
 
-window.fetch = async function(resource, options) {
+window. = async function(resource, options) {
   let url = typeof resource === "string" ? resource : resource.url;
   let cleanPath = url.split("/").pop();
 
@@ -110,10 +110,27 @@ async function unzipAndStore(zipBlob) {
 let loadedBytes = 0;
 
 async function fetchWithProgress(url) {
-  const response = await originalFetch(url);
+  let response;
+
+  try {
+    response = await originalFetch(url);
+  } catch (err) {
+    throw new Error(
+      "FETCH REJECTED | URL: " + url +
+      " | TYPE: " + err.name +
+      " | MESSAGE: " + err.message
+    );
+  }
 
   if (!response.ok) {
-    throw new Error("Failed to fetch: " + url);
+    throw new Error(
+      "HTTP ERROR " + response.status +
+      " | URL: " + url
+    );
+  }
+
+  if (!response.body) {
+    throw new Error("No response body | URL: " + url);
   }
 
   const reader = response.body.getReader();
@@ -129,7 +146,7 @@ async function fetchWithProgress(url) {
     chunks.push(value);
 
     let mbDone = (loadedBytes / (1024 * 1024)).toFixed(2);
-    let mbTotal = '1986.64';
+    let mbTotal = "1986.64";
 
     loadingText.textContent =
       `DOWNLOADING ASSETS... (${mbDone} MB / ${mbTotal} MB)`;
