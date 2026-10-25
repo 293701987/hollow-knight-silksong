@@ -174,24 +174,39 @@ async function fetchWithProgress(url) {
 
 /* ================= MERGE ================= */
 
+
+/* ================= MERGE ================= */
+
 async function mergeFiles(parts) {
   console.log("Downloading parts:", parts.length);
 
-  const buffers = await Promise.all(
-    parts.map(async (part, index) => {
-      try {
-        return await fetchWithProgress(part);
-      } catch (err) {
-        throw new Error(
-          "Chunk " + (index + 1) + " failed (" + part + "): " +
-          (err && err.message ? err.message : String(err))
-        );
-      }
-    })
-  );
+  const buffers = [];
+  const batchSize = 5;
+
+  for (let i = 0; i < parts.length; i += batchSize) {
+    const batch = parts.slice(i, i + batchSize);
+
+    const results = await Promise.all(
+      batch.map(async (part, index) => {
+        try {
+          return await fetchWithProgress(part);
+        } catch (err) {
+          throw new Error(
+            "Chunk " + (i + index + 1) + " failed (" + part + "): " +
+            (err && err.message ? err.message : String(err))
+          );
+        }
+      })
+    );
+
+    buffers.push(...results);
+  }
 
   return new Blob(buffers);
 }
+
+/* ================= UTIL ================= */
+
 
 /* ================= UTIL ================= */
 function getParts(file, start, end) {
