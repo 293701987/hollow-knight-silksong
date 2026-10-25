@@ -147,11 +147,21 @@ async function fetchWithProgress(url) {
 }
 
 /* ================= MERGE ================= */
+
 async function mergeFiles(parts) {
   console.log("Downloading parts:", parts.length);
 
   const buffers = await Promise.all(
-    parts.map(part => fetchWithProgress(part))
+    parts.map(async (part, index) => {
+      try {
+        return await fetchWithProgress(part);
+      } catch (err) {
+        throw new Error(
+          "Chunk " + (index + 1) + " failed (" + part + "): " +
+          (err && err.message ? err.message : String(err))
+        );
+      }
+    })
   );
 
   return new Blob(buffers);
