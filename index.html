@@ -25,7 +25,8 @@
 <script>
 const loadingText = document.querySelector("#loading-text");
 const CACHE_NAME = "hksilksongcache-v2"; // bump version if needed
-
+let diagnosticStage = "script startup";
+  
 /* ================= FETCH OVERRIDE ================= */
 const originalFetch = window.fetch;
 
@@ -166,20 +167,28 @@ function getParts(file, start, end) {
 }
 
 /* ================= MAIN ================= */
+
 (async () => {
   try {
-    await cleanupOldCaches(); 
+    diagnosticStage = "cleaning old caches";
+    await cleanupOldCaches();
+
+    diagnosticStage = "checking existing cache";
     if (!(await isCached())) {
       loadingText.textContent = "DOWNLOADING ASSETS...";
 
+      diagnosticStage = "downloading asset chunks";
       const webglzip = await mergeFiles(
         getParts("StreamingAssets/aa/WebGL.zip", 1, 100)
       );
 
+      diagnosticStage = "extracting and storing assets";
       await unzipAndStore(webglzip);
     } else {
       loadingText.textContent = "LOADING FROM CACHE...";
     }
+
+    diagnosticStage = "starting Unity";
 
     /* ================= UNITY START ================= */
     const canvas = document.querySelector("#unity-canvas");
@@ -244,8 +253,12 @@ function getParts(file, start, end) {
     document.body.appendChild(script);
 
   } catch (err) {
-    console.error(err);
-    loadingText.textContent = "ERROR: " + err.message;
+    console.error("Diagnostic stage:", diagnosticStage, err);
+
+    loadingText.textContent =
+      "ERROR at " + diagnosticStage + ": " +
+      (err && err.name ? err.name + ": " : "") +
+      String(err && err.message ? err.message : err);
   }
 })();
 </script>
