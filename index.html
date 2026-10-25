@@ -113,10 +113,16 @@ let loadedBytes = 0;
 async function fetchWithProgress(url) {
   let response;
 
-  try {
-    const absoluteUrl = new URL(url, document.baseURI).href;
-response = await originalFetch(absoluteUrl);
-  } catch (err) {
+ try {
+  const absoluteUrl = new URL(url, document.baseURI).href;
+
+  loadingText.textContent = "TESTING CHUNK REQUEST...";
+
+  response = await originalFetch(absoluteUrl, {
+    mode: "cors",
+    cache: "no-store"
+  });
+} catch (err) {
     throw new Error(
       "FETCH REJECTED | URL: " + new URL(url, document.baseURI).href +
 " | PAGE BASE: " + document.baseURI +
